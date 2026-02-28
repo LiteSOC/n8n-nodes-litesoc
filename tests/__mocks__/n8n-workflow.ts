@@ -23,6 +23,14 @@ export class NodeApiError extends Error {
   }
 }
 
+// Mock NodeOperationError class
+export class NodeOperationError extends Error {
+  constructor(node: unknown, message: string) {
+    super(message);
+    this.name = 'NodeOperationError';
+  }
+}
+
 // Type definitions (minimal for testing)
 export interface IDataObject {
   [key: string]: unknown;

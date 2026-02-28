@@ -5,7 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { alertFields, alertOperations } from './descriptions/AlertDescription';
 import { eventFields, eventOperations } from './descriptions/EventDescription';
@@ -91,7 +91,8 @@ export class LiteSoc implements INodeType {
 						if (eventType === 'custom') {
 							eventType = this.getNodeParameter('customEventType', i) as string;
 							if (!eventType.includes('.')) {
-								throw new Error(
+								throw new NodeOperationError(
+									this.getNode(),
 									'Custom event type must be in format category.action (e.g., billing.payment_failed)',
 								);
 							}
@@ -197,7 +198,10 @@ export class LiteSoc implements INodeType {
 								[];
 						}
 					} else {
-						throw new Error(`Operation "${operation}" is not supported for event resource`);
+						throw new NodeOperationError(
+							this.getNode(),
+							`Operation "${operation}" is not supported for event resource`,
+						);
 					}
 				}
 
@@ -319,10 +323,16 @@ export class LiteSoc implements INodeType {
 							body,
 						)) as IDataObject;
 					} else {
-						throw new Error(`Operation "${operation}" is not supported for alert resource`);
+						throw new NodeOperationError(
+							this.getNode(),
+							`Operation "${operation}" is not supported for alert resource`,
+						);
 					}
 				} else {
-					throw new Error(`Resource "${resource}" is not supported`);
+					throw new NodeOperationError(
+						this.getNode(),
+						`Resource "${resource}" is not supported`,
+					);
 				}
 
 				// Handle array vs single object response

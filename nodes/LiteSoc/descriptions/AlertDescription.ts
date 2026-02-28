@@ -243,11 +243,6 @@ export const alertFields: INodeProperties[] = [
 				description: 'The malicious IP address has been blocked',
 			},
 			{
-				name: 'Reset Password',
-				value: 'reset_password',
-				description: 'User password was reset as a security measure',
-			},
-			{
 				name: 'Contacted User',
 				value: 'contacted_user',
 				description: 'The user has been contacted about the activity',
@@ -261,6 +256,11 @@ export const alertFields: INodeProperties[] = [
 				name: 'Other',
 				value: 'other',
 				description: 'Other resolution action taken',
+			},
+			{
+				name: 'Reset Password',
+				value: 'reset_password',
+				description: 'User password was reset as a security measure',
 			},
 		],
 		default: 'false_positive',

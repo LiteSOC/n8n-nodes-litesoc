@@ -5,6 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-litesoc.svg)](https://www.npmjs.com/package/n8n-nodes-litesoc)
 [![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
+[![ESLint](https://img.shields.io/badge/ESLint-passing-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This is an n8n community node for [LiteSOC](https://www.litesoc.io) - Security Observability for Startups.
@@ -152,6 +153,43 @@ If you attempt a restricted operation on the Free plan, you'll receive a clear e
 * [LiteSOC Documentation](https://www.litesoc.io/docs/api)
 * [n8n Community Nodes Documentation](https://docs.n8n.io/integrations/community-nodes/)
 * [LiteSOC Pricing](https://www.litesoc.io/pricing)
+
+## Development
+
+### Setup
+
+```bash
+npm install
+```
+
+### Build
+
+```bash
+npm run build
+```
+
+### Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+### Linting
+
+```bash
+# Check for lint errors
+npm run lint
+
+# Fix lint errors automatically
+npm run lintfix
+```
 
 ## License
 

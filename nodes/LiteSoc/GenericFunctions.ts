@@ -67,6 +67,7 @@ export async function litesocApiRequest(
 		const errorMessage = (errorBody?.error as JsonObject)?.message as string || '';
 		const apiMessage = errorMessage || (err.message as string) || (err.description as string) || '';
 
+		// eslint-disable-next-line no-useless-assignment -- Default value used in switch default case
 		let userMessage = 'LiteSOC API request failed';
 		let httpCode: string | undefined;
 

@@ -54,16 +54,52 @@ export const eventFields: INodeProperties[] = [
 		},
 		hint: 'Severity is automatically assigned by LiteSOC based on the event type. Critical: privilege_escalation, bulk_delete, suspicious_activity, brute_force. Warning: login_failed, mfa_disabled, user_deleted. Info: all other events.',
 		options: [
-			// Authentication Events
+			// Admin Events
 			{
-				name: 'Auth: Login Success',
-				value: 'auth.login_success',
-				description: 'User successfully logged in',
+				name: 'Admin: API Key Created',
+				value: 'admin.api_key_created',
+				description: 'API key was created',
 			},
+			{
+				name: 'Admin: API Key Revoked',
+				value: 'admin.api_key_revoked',
+				description: 'API key was revoked',
+			},
+			{
+				name: 'Admin: Privilege Escalation',
+				value: 'admin.privilege_escalation',
+				description: 'Privilege escalation detected',
+			},
+			{
+				name: 'Admin: Settings Changed',
+				value: 'admin.settings_changed',
+				description: 'System settings were changed',
+			},
+			{
+				name: 'Admin: User Created',
+				value: 'admin.user_created',
+				description: 'New user was created',
+			},
+			{
+				name: 'Admin: User Deleted',
+				value: 'admin.user_deleted',
+				description: 'User was deleted',
+			},
+			{
+				name: 'Admin: User Suspended',
+				value: 'admin.user_suspended',
+				description: 'User was suspended',
+			},
+			// Authentication Events
 			{
 				name: 'Auth: Login Failed',
 				value: 'auth.login_failed',
 				description: 'Failed login attempt',
+			},
+			{
+				name: 'Auth: Login Success',
+				value: 'auth.login_success',
+				description: 'User successfully logged in',
 			},
 			{
 				name: 'Auth: Logout',
@@ -71,9 +107,9 @@ export const eventFields: INodeProperties[] = [
 				description: 'User logged out',
 			},
 			{
-				name: 'Auth: Password Reset',
-				value: 'auth.password_reset',
-				description: 'Password was reset',
+				name: 'Auth: MFA Disabled',
+				value: 'auth.mfa_disabled',
+				description: 'Multi-factor authentication disabled',
 			},
 			{
 				name: 'Auth: MFA Enabled',
@@ -81,9 +117,9 @@ export const eventFields: INodeProperties[] = [
 				description: 'Multi-factor authentication enabled',
 			},
 			{
-				name: 'Auth: MFA Disabled',
-				value: 'auth.mfa_disabled',
-				description: 'Multi-factor authentication disabled',
+				name: 'Auth: Password Reset',
+				value: 'auth.password_reset',
+				description: 'Password was reset',
 			},
 			{
 				name: 'Auth: Session Expired',
@@ -102,11 +138,6 @@ export const eventFields: INodeProperties[] = [
 				description: 'Access to resource was denied',
 			},
 			{
-				name: 'Authz: Role Changed',
-				value: 'authz.role_changed',
-				description: 'User role was changed',
-			},
-			{
 				name: 'Authz: Permission Granted',
 				value: 'authz.permission_granted',
 				description: 'Permission was granted',
@@ -116,52 +147,27 @@ export const eventFields: INodeProperties[] = [
 				value: 'authz.permission_revoked',
 				description: 'Permission was revoked',
 			},
-			// Admin Events
 			{
-				name: 'Admin: User Created',
-				value: 'admin.user_created',
-				description: 'New user was created',
+				name: 'Authz: Role Changed',
+				value: 'authz.role_changed',
+				description: 'User role was changed',
 			},
+			// Custom Event
 			{
-				name: 'Admin: User Deleted',
-				value: 'admin.user_deleted',
-				description: 'User was deleted',
-			},
-			{
-				name: 'Admin: User Suspended',
-				value: 'admin.user_suspended',
-				description: 'User was suspended',
-			},
-			{
-				name: 'Admin: Privilege Escalation',
-				value: 'admin.privilege_escalation',
-				description: 'Privilege escalation detected',
-			},
-			{
-				name: 'Admin: Settings Changed',
-				value: 'admin.settings_changed',
-				description: 'System settings were changed',
-			},
-			{
-				name: 'Admin: API Key Created',
-				value: 'admin.api_key_created',
-				description: 'API key was created',
-			},
-			{
-				name: 'Admin: API Key Revoked',
-				value: 'admin.api_key_revoked',
-				description: 'API key was revoked',
+				name: 'Custom Event',
+				value: 'custom',
+				description: 'Define a custom event type',
 			},
 			// Data Events
-			{
-				name: 'Data: Export',
-				value: 'data.export',
-				description: 'Data was exported',
-			},
 			{
 				name: 'Data: Bulk Delete',
 				value: 'data.bulk_delete',
 				description: 'Bulk data deletion',
+			},
+			{
+				name: 'Data: Export',
+				value: 'data.export',
+				description: 'Data was exported',
 			},
 			{
 				name: 'Data: Sensitive Access',
@@ -170,14 +176,9 @@ export const eventFields: INodeProperties[] = [
 			},
 			// Security Events
 			{
-				name: 'Security: Suspicious Activity',
-				value: 'security.suspicious_activity',
-				description: 'Suspicious activity detected',
-			},
-			{
-				name: 'Security: Rate Limit Exceeded',
-				value: 'security.rate_limit_exceeded',
-				description: 'Rate limit was exceeded',
+				name: 'Security: Brute Force Detected',
+				value: 'security.brute_force_detected',
+				description: 'Brute force attack detected',
 			},
 			{
 				name: 'Security: IP Blocked',
@@ -185,15 +186,14 @@ export const eventFields: INodeProperties[] = [
 				description: 'IP address was blocked',
 			},
 			{
-				name: 'Security: Brute Force Detected',
-				value: 'security.brute_force_detected',
-				description: 'Brute force attack detected',
+				name: 'Security: Rate Limit Exceeded',
+				value: 'security.rate_limit_exceeded',
+				description: 'Rate limit was exceeded',
 			},
-			// Custom Event
 			{
-				name: 'Custom Event',
-				value: 'custom',
-				description: 'Define a custom event type',
+				name: 'Security: Suspicious Activity',
+				value: 'security.suspicious_activity',
+				description: 'Suspicious activity detected',
 			},
 		],
 		default: 'auth.login_failed',
