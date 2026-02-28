@@ -86,7 +86,7 @@ exports.alertFields = [
             maxValue: 100,
         },
         default: 50,
-        description: 'Max number of results to return. Maximum: 100 per request.',
+        description: 'Max number of results to return',
     },
     {
         displayName: 'Filters',
