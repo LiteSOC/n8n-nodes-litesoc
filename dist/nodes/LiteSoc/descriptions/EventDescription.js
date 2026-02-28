@@ -23,13 +23,13 @@ exports.eventOperations = [
             {
                 name: 'Get',
                 value: 'get',
-                description: 'Fetches details of a single event. Returns: id, event_name, severity (critical/warning/info), actor_id, ip_address, metadata, created_at. Severity is auto-assigned by LiteSOC. Note: Free tier users can only fetch events from the last 7 days and enrichment data (VPN/Maps) will be hidden.',
+                description: 'Fetches details of a single event. Returns: id (UUID), event_name, severity (critical/warning/info), actor_id, ip_address, trigger_event_id, forensics object (network: is_vpn, is_tor, is_proxy, is_datacenter, asn, threat_score; location: city, country_code, region, latitude, longitude, timezone) for Pro+ tiers (null for Free tier), metadata, created_at. Severity is auto-assigned by LiteSOC. Note: Free tier users can only fetch events from the last 7 days.',
                 action: 'Get a security event',
             },
             {
                 name: 'Get Many',
                 value: 'getAll',
-                description: 'Get many security events. Each event includes severity (critical/warning/info) auto-assigned by LiteSOC based on event type, enabling easy filtering in IF/Switch nodes.',
+                description: 'Get many security events. Each event includes: id (UUID), trigger_event_id, forensics object (network/location data for Pro+ tiers, null for Free tier), severity (critical/warning/info) auto-assigned by LiteSOC based on event type, enabling easy filtering in IF/Switch nodes.',
                 action: 'Get many security events',
             },
         ],
@@ -326,7 +326,8 @@ exports.eventFields = [
             },
         },
         default: '',
-        description: 'The ID of the event to retrieve',
+        placeholder: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'The UUID of the event to retrieve',
     },
     {
         displayName: 'Return All',

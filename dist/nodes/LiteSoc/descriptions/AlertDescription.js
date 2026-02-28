@@ -17,13 +17,13 @@ exports.alertOperations = [
             {
                 name: 'Get',
                 value: 'get',
-                description: 'Get a specific alert. Returns: id, alert_type, severity (critical/high/medium/low), status, title, description, source_ip, actor_id, created_at, updated_at, metadata. Severity is auto-assigned by LiteSOC.',
+                description: 'Get a specific alert. Returns: id (UUID), alert_type, severity (critical/high/medium/low), status, title, description, source_ip, actor_id, trigger_event_id (UUID of triggering event), forensics (network/location data for Pro+ tiers, null for Free), created_at, updated_at, metadata. Severity is auto-assigned by LiteSOC.',
                 action: 'Get an alert',
             },
             {
                 name: 'Get Many',
                 value: 'getAll',
-                description: 'Get many alerts. Each alert includes severity (critical/high/medium/low) auto-assigned by LiteSOC, enabling easy filtering in subsequent nodes.',
+                description: 'Get many alerts. Each alert includes: id (UUID), trigger_event_id (UUID of triggering event), forensics object (network: is_vpn, is_tor, is_proxy, is_datacenter, asn, threat_score; location: city, country_code, region, latitude, longitude, timezone) for Pro+ tiers. Severity (critical/high/medium/low) is auto-assigned by LiteSOC.',
                 action: 'Get many alerts',
             },
             {
@@ -55,7 +55,8 @@ exports.alertFields = [
             },
         },
         default: '',
-        description: 'The ID of the alert to retrieve',
+        placeholder: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'The UUID of the alert to retrieve',
     },
     {
         displayName: 'Return All',
@@ -212,7 +213,8 @@ exports.alertFields = [
             },
         },
         default: '',
-        description: 'The ID of the alert to resolve',
+        placeholder: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'The UUID of the alert to resolve',
     },
     {
         displayName: 'Resolution Type',
@@ -284,7 +286,8 @@ exports.alertFields = [
             },
         },
         default: '',
-        description: 'The ID of the alert to mark as safe',
+        placeholder: '550e8400-e29b-41d4-a716-446655440000',
+        description: 'The UUID of the alert to mark as safe',
     },
     {
         displayName: 'Internal Notes',

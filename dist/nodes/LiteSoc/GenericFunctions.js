@@ -7,7 +7,7 @@ exports.validateSeverity = validateSeverity;
 exports.buildActor = buildActor;
 exports.parseMetadata = parseMetadata;
 const n8n_workflow_1 = require("n8n-workflow");
-const LITESOC_NODE_VERSION = '1.0.0';
+const LITESOC_NODE_VERSION = '1.1.0';
 const LITESOC_API_BASE_URL = 'https://api.litesoc.io';
 async function litesocApiRequest(method, endpoint, body = {}, qs = {}) {
     const options = {
