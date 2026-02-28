@@ -256,25 +256,68 @@ describe('LiteSoc Node', () => {
     describe('event:get', () => {
       it('should get a single event by ID', async () => {
         const mockResponse = {
-          id: 'evt_123',
+          id: '550e8400-e29b-41d4-a716-446655440001',
           event: 'auth.login',
           severity: 'info',
+          trigger_event_id: '550e8400-e29b-41d4-a716-446655440002',
+          forensics: {
+            network: {
+              is_vpn: false,
+              is_tor: false,
+              is_proxy: false,
+              is_datacenter: false,
+              asn: 'AS15169',
+              threat_score: 0,
+            },
+            location: {
+              city: 'Mountain View',
+              country_code: 'US',
+              region: 'California',
+              latitude: 37.3861,
+              longitude: -122.0839,
+              timezone: 'America/Los_Angeles',
+            },
+          },
         };
         mockLitesocApiRequest.mockResolvedValue(mockResponse);
 
         const mockFunctions = createMockExecuteFunctions({
           resource: 'event',
           operation: 'get',
-          eventId: 'evt_123',
+          eventId: '550e8400-e29b-41d4-a716-446655440001',
         });
 
         const result = await node.execute.call(mockFunctions);
 
         expect(mockLitesocApiRequest).toHaveBeenCalledWith(
           'GET',
-          '/events/evt_123'
+          '/events/550e8400-e29b-41d4-a716-446655440001'
         );
         expect(result[0][0].json).toEqual(mockResponse);
+        expect(result[0][0].json.trigger_event_id).toBe('550e8400-e29b-41d4-a716-446655440002');
+        expect(result[0][0].json.forensics).toBeDefined();
+      });
+
+      it('should handle event with null forensics (Free tier)', async () => {
+        const mockResponse = {
+          id: '550e8400-e29b-41d4-a716-446655440003',
+          event: 'auth.login',
+          severity: 'info',
+          trigger_event_id: null,
+          forensics: null,
+        };
+        mockLitesocApiRequest.mockResolvedValue(mockResponse);
+
+        const mockFunctions = createMockExecuteFunctions({
+          resource: 'event',
+          operation: 'get',
+          eventId: '550e8400-e29b-41d4-a716-446655440003',
+        });
+
+        const result = await node.execute.call(mockFunctions);
+
+        expect(result[0][0].json.forensics).toBeNull();
+        expect(result[0][0].json.trigger_event_id).toBeNull();
       });
     });
 
@@ -428,26 +471,70 @@ describe('LiteSoc Node', () => {
     describe('alert:get', () => {
       it('should get a single alert by ID', async () => {
         const mockResponse = {
-          id: 'alt_123',
+          id: '550e8400-e29b-41d4-a716-446655440010',
           alert_type: 'brute_force',
           severity: 'high',
           status: 'open',
+          trigger_event_id: '550e8400-e29b-41d4-a716-446655440011',
+          forensics: {
+            network: {
+              is_vpn: true,
+              is_tor: false,
+              is_proxy: false,
+              is_datacenter: true,
+              asn: 'AS12345',
+              threat_score: 75,
+            },
+            location: {
+              city: 'Amsterdam',
+              country_code: 'NL',
+              region: 'North Holland',
+              latitude: 52.3676,
+              longitude: 4.9041,
+              timezone: 'Europe/Amsterdam',
+            },
+          },
         };
         mockLitesocApiRequest.mockResolvedValue(mockResponse);
 
         const mockFunctions = createMockExecuteFunctions({
           resource: 'alert',
           operation: 'get',
-          alertId: 'alt_123',
+          alertId: '550e8400-e29b-41d4-a716-446655440010',
         });
 
         const result = await node.execute.call(mockFunctions);
 
         expect(mockLitesocApiRequest).toHaveBeenCalledWith(
           'GET',
-          '/alerts/alt_123'
+          '/alerts/550e8400-e29b-41d4-a716-446655440010'
         );
         expect(result[0][0].json).toEqual(mockResponse);
+        expect(result[0][0].json.trigger_event_id).toBe('550e8400-e29b-41d4-a716-446655440011');
+        expect(result[0][0].json.forensics).toBeDefined();
+      });
+
+      it('should handle alert with null forensics (Free tier)', async () => {
+        const mockResponse = {
+          id: '550e8400-e29b-41d4-a716-446655440012',
+          alert_type: 'brute_force',
+          severity: 'high',
+          status: 'open',
+          trigger_event_id: '550e8400-e29b-41d4-a716-446655440013',
+          forensics: null,
+        };
+        mockLitesocApiRequest.mockResolvedValue(mockResponse);
+
+        const mockFunctions = createMockExecuteFunctions({
+          resource: 'alert',
+          operation: 'get',
+          alertId: '550e8400-e29b-41d4-a716-446655440012',
+        });
+
+        const result = await node.execute.call(mockFunctions);
+
+        expect(result[0][0].json.forensics).toBeNull();
+        expect(result[0][0].json.trigger_event_id).toBe('550e8400-e29b-41d4-a716-446655440013');
       });
     });
 
