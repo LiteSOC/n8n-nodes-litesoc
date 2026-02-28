@@ -1,0 +1,74 @@
+{
+  "name": "n8n-nodes-litesoc",
+  "version": "1.0.0",
+  "description": "n8n community node for LiteSOC - Security Observability for Startups. Track security events and manage alerts.",
+  "keywords": [
+    "n8n-community-node-package",
+    "n8n",
+    "security",
+    "soc",
+    "siem",
+    "litesoc",
+    "audit",
+    "compliance",
+    "threat-detection",
+    "monitoring"
+  ],
+  "license": "MIT",
+  "homepage": "https://www.litesoc.io",
+  "author": {
+    "name": "LiteSOC",
+    "email": "hello@litesoc.io",
+    "url": "https://www.litesoc.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/litesoc/n8n-nodes-litesoc.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && gulp",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint nodes --ext .ts",
+    "lintfix": "eslint nodes --ext .ts --fix",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/nodes/credentials/LiteSocApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/LiteSoc/LiteSoc.node.js"
+    ]
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "gulp": "^5.0.1",
+    "jest": "^29.7.0",
+    "n8n-workflow": "^1.0.0",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  },
+  "overrides": {
+    "form-data": "^4.0.4"
+  }
+}

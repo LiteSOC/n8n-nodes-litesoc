@@ -1,0 +1,22 @@
+{
+	"node": "n8n-nodes-base.liteSoc",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Security"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://www.litesoc.io/docs/api#management-api-overview"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://www.litesoc.io/docs/api"
+			}
+		]
+	},
+	"alias": ["security", "audit", "soc", "siem", "threat", "compliance", "logging", "monitoring"],
+	"subcategories": {
+		"Security": ["Audit", "Compliance", "Threat Detection"]
+	}
+}
