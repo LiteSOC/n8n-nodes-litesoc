@@ -4,12 +4,9 @@ on:
   release:
     types: [published]
 
-# Trusted Publishing uses OIDC - no NPM_TOKEN secret needed!
-# Configure Trusted Publishing at: https://www.npmjs.com/package/n8n-nodes-litesoc/settings
-
 permissions:
   contents: read
-  id-token: write  # Required for npm provenance and OIDC
+  id-token: write  # Required for npm provenance
 
 jobs:
   publish:
@@ -36,7 +33,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Uses npm Trusted Publishing (OIDC) - no token required!
+      - name: Debug token
+        run: |
+          echo "Token length: ${#NODE_AUTH_TOKEN}"
+          npm whoami || echo "npm whoami failed"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish to npm with provenance
         run: npm publish --provenance --access public
         env:
