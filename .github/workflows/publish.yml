@@ -39,3 +39,5 @@ jobs:
       # Uses npm Trusted Publishing (OIDC) - no token required!
       - name: Publish to npm with provenance
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
