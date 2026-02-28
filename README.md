@@ -1,6 +1,6 @@
 # n8n-nodes-litesoc
 
-![LiteSOC Logo](assets/LiteSoc.svg)
+<img src="assets/LiteSoc.svg" alt="LiteSOC Logo" width="120">
 
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-litesoc.svg)](https://www.npmjs.com/package/n8n-nodes-litesoc)
 [![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
@@ -139,8 +139,9 @@ Some features require a Pro or Enterprise plan:
 | Track Events | ✅ | ✅ | ✅ |
 | Get Events (last 7 days) | ✅ | ✅ | ✅ |
 | Get Events (30+ days) | ❌ | ✅ | ✅ |
-| Get Alerts | ✅ | ✅ | ✅ |
+| Get Alerts | ❌ | ✅ | ✅ |
 | Resolve Alerts | ❌ | ✅ | ✅ |
+| Mark Alerts Safe | ❌ | ✅ | ✅ |
 | IP Enrichment (VPN/Proxy) | ❌ | ✅ | ✅ |
 | Geo Location Maps | ❌ | ✅ | ✅ |
 
