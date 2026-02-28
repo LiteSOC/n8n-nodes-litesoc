@@ -54,7 +54,7 @@ export const eventFields: INodeProperties[] = [
 		},
 		hint: 'Severity is automatically assigned by LiteSOC based on the event type. Critical: privilege_escalation, bulk_delete, suspicious_activity, brute_force. Warning: login_failed, mfa_disabled, user_deleted. Info: all other events.',
 		options: [
-			// Admin Events
+			// Admin Events (alphabetically)
 			{
 				name: 'Admin: API Key Created',
 				value: 'admin.api_key_created',
@@ -90,7 +90,7 @@ export const eventFields: INodeProperties[] = [
 				value: 'admin.user_suspended',
 				description: 'User was suspended',
 			},
-			// Authentication Events
+			// Authentication Events (alphabetically)
 			{
 				name: 'Auth: Login Failed',
 				value: 'auth.login_failed',
@@ -131,7 +131,7 @@ export const eventFields: INodeProperties[] = [
 				value: 'auth.token_refreshed',
 				description: 'Authentication token was refreshed',
 			},
-			// Authorization Events
+			// Authorization Events (alphabetically)
 			{
 				name: 'Authz: Access Denied',
 				value: 'authz.access_denied',
@@ -152,13 +152,13 @@ export const eventFields: INodeProperties[] = [
 				value: 'authz.role_changed',
 				description: 'User role was changed',
 			},
-			// Custom Event
+			// Custom Event (special - not alphabetized, placed here for visibility)
 			{
 				name: 'Custom Event',
 				value: 'custom',
 				description: 'Define a custom event type',
 			},
-			// Data Events
+			// Data Events (alphabetically)
 			{
 				name: 'Data: Bulk Delete',
 				value: 'data.bulk_delete',
@@ -174,7 +174,7 @@ export const eventFields: INodeProperties[] = [
 				value: 'data.sensitive_access',
 				description: 'Sensitive data was accessed',
 			},
-			// Security Events
+			// Security Events (alphabetically)
 			{
 				name: 'Security: Brute Force Detected',
 				value: 'security.brute_force_detected',

@@ -3,10 +3,11 @@
 <img src="assets/LiteSoc.svg" alt="LiteSOC Logo" width="120">
 
 [![npm version](https://img.shields.io/npm/v/n8n-nodes-litesoc.svg)](https://www.npmjs.com/package/n8n-nodes-litesoc)
-[![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
-[![ESLint](https://img.shields.io/badge/ESLint-passing-brightgreen.svg)](https://github.com/LiteSOC/n8n/actions)
+[![CI](https://github.com/litesoc/n8n-nodes-litesoc/actions/workflows/ci.yml/badge.svg)](https://github.com/litesoc/n8n-nodes-litesoc/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-103%20passed-brightgreen.svg)](https://github.com/litesoc/n8n-nodes-litesoc/actions)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/litesoc/n8n-nodes-litesoc/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm provenance](https://img.shields.io/badge/npm-provenance-blue.svg)](https://docs.npmjs.com/generating-provenance-statements)
 
 This is an n8n community node for [LiteSOC](https://www.litesoc.io) - Security Observability for Startups.
 
@@ -190,6 +191,41 @@ npm run lint
 # Fix lint errors automatically
 npm run lintfix
 ```
+
+## CI/CD
+
+This package uses GitHub Actions for continuous integration and publishing with npm provenance.
+
+### Continuous Integration
+
+The CI workflow (`.github/workflows/ci.yml`) runs on every push and pull request:
+- Tests run on Node.js 18 and 20
+- ESLint checks code quality
+- Test coverage is collected
+
+### Publishing with Provenance
+
+This package is published with [npm Trusted Publishing](https://docs.npmjs.com/generating-provenance-statements#publishing-packages-with-provenance-via-github-actions), which uses OIDC for secure, tokenless authentication.
+
+**One-time setup (npm):**
+
+1. Go to your package settings: `https://www.npmjs.com/package/n8n-nodes-litesoc/settings`
+2. Click **Configure Trusted Publishing**
+3. Add provider with:
+   - Repository owner: `litesoc`
+   - Repository name: `n8n-nodes-litesoc`
+   - Workflow filename: `publish.yml`
+
+**To publish a new version:**
+
+1. Update the version in `package.json`
+2. Commit and push the changes
+3. Create a new GitHub Release with a tag matching the version (e.g., `v1.0.0`)
+4. The publish workflow will automatically build, test, and publish to npm with provenance
+
+> **Note:** No `NPM_TOKEN` secret is needed! Trusted Publishing uses OIDC authentication.
+
+> **n8n Requirement:** Starting May 1st, 2026, all n8n community nodes must be published using GitHub Actions with provenance. This package already meets this requirement.
 
 ## License
 

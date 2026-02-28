@@ -67,7 +67,7 @@ class LiteSoc {
                         if (eventType === 'custom') {
                             eventType = this.getNodeParameter('customEventType', i);
                             if (!eventType.includes('.')) {
-                                throw new Error('Custom event type must be in format category.action (e.g., billing.payment_failed)');
+                                throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Custom event type must be in format category.action (e.g., billing.payment_failed)');
                             }
                         }
                         const actorId = this.getNodeParameter('actorId', i);
@@ -130,7 +130,7 @@ class LiteSoc {
                         }
                     }
                     else {
-                        throw new Error(`Operation "${operation}" is not supported for event resource`);
+                        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Operation "${operation}" is not supported for event resource`);
                     }
                 }
                 else if (resource === 'alert') {
@@ -198,11 +198,11 @@ class LiteSoc {
                         responseData = (await GenericFunctions_1.litesocApiRequest.call(this, 'PATCH', `/alerts/${alertId}`, body));
                     }
                     else {
-                        throw new Error(`Operation "${operation}" is not supported for alert resource`);
+                        throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Operation "${operation}" is not supported for alert resource`);
                     }
                 }
                 else {
-                    throw new Error(`Resource "${resource}" is not supported`);
+                    throw new n8n_workflow_1.NodeOperationError(this.getNode(), `Resource "${resource}" is not supported`);
                 }
                 const executionData = this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(responseData), { itemData: { item: i } });
                 returnData.push(...executionData);
