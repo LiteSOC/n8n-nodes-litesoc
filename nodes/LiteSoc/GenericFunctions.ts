@@ -11,7 +11,7 @@ import type {
 import { NodeApiError } from 'n8n-workflow';
 
 // LiteSOC n8n Node version - used for User-Agent header
-const LITESOC_NODE_VERSION = '1.1.0';
+const LITESOC_NODE_VERSION = '1.2.0';
 
 // Production API URL
 const LITESOC_API_BASE_URL = 'https://api.litesoc.io';
