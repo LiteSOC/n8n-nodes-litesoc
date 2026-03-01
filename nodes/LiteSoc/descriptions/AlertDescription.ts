@@ -185,27 +185,6 @@ export const alertFields: INodeProperties[] = [
 				default: '',
 				description: 'Filter by alert status',
 			},
-			{
-				displayName: 'Actor ID',
-				name: 'actorId',
-				type: 'string',
-				default: '',
-				description: 'Filter by the actor (user) who triggered the alert',
-			},
-			{
-				displayName: 'Start Date',
-				name: 'startDate',
-				type: 'dateTime',
-				default: '',
-				description: 'Filter alerts after this date',
-			},
-			{
-				displayName: 'End Date',
-				name: 'endDate',
-				type: 'dateTime',
-				default: '',
-				description: 'Filter alerts before this date',
-			},
 		],
 	},
 

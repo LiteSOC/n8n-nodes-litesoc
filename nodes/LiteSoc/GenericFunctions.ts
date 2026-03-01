@@ -11,7 +11,7 @@ import type {
 import { NodeApiError } from 'n8n-workflow';
 
 // LiteSOC n8n Node version - used for User-Agent header
-const LITESOC_NODE_VERSION = '1.2.0';
+const LITESOC_NODE_VERSION = '1.3.0';
 
 // Production API URL
 const LITESOC_API_BASE_URL = 'https://api.litesoc.io';
@@ -141,12 +141,12 @@ export async function litesocApiRequestAllItems(
 ): Promise<IDataObject[]> {
 	const returnData: IDataObject[] = [];
 
-	let page = 1;
+	let offset = 0;
 	const pageSize = 100;
 	let hasMore = true;
 
 	while (hasMore) {
-		qs.page = page;
+		qs.offset = offset;
 		qs.limit = pageSize;
 
 		const response = (await litesocApiRequest.call(this, method, endpoint, body, qs)) as IDataObject;
@@ -154,8 +154,9 @@ export async function litesocApiRequestAllItems(
 		const items = (response.data as IDataObject[]) || (response.items as IDataObject[]) || [];
 		returnData.push(...items);
 
-		// Check if we have more pages
-		const total = (response.total as number) || 0;
+		// Check if we have more pages - read from pagination object
+		const pagination = response.pagination as IDataObject | undefined;
+		const total = (pagination?.total as number) || (response.total as number) || 0;
 		const currentCount = returnData.length;
 
 		if (currentCount >= total || items.length < pageSize) {
@@ -167,7 +168,7 @@ export async function litesocApiRequestAllItems(
 			return returnData.slice(0, limit);
 		}
 
-		page++;
+		offset += pageSize;
 	}
 
 	return returnData;

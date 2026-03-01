@@ -219,7 +219,6 @@ export const eventFields: INodeProperties[] = [
 		displayName: 'Actor ID',
 		name: 'actorId',
 		type: 'string',
-		required: true,
 		displayOptions: {
 			show: {
 				resource: ['event'],
@@ -231,7 +230,7 @@ export const eventFields: INodeProperties[] = [
 		},
 		default: '',
 		placeholder: 'user_123',
-		description: 'Unique identifier for the actor (user) performing the action. Maximum 255 characters.',
+		description: 'Unique identifier for the actor (user) performing the action. Maximum 255 characters. Optional for system events.',
 	},
 	{
 		displayName: 'Actor Email',
@@ -261,28 +260,7 @@ export const eventFields: INodeProperties[] = [
 		placeholder: '192.168.1.1',
 		description: 'IP address of the user making the request',
 	},
-	{
-		displayName: 'Additional Fields',
-		name: 'additionalFields',
-		type: 'collection',
-		placeholder: 'Add Field',
-		default: {},
-		displayOptions: {
-			show: {
-				resource: ['event'],
-				operation: ['create'],
-			},
-		},
-		options: [
-			{
-				displayName: 'Timestamp',
-				name: 'timestamp',
-				type: 'dateTime',
-				default: '',
-				description: 'Custom timestamp for the event (defaults to current time)',
-			},
-		],
-	},
+
 	{
 		displayName: 'Metadata',
 		name: 'metadata',
@@ -376,7 +354,7 @@ export const eventFields: INodeProperties[] = [
 			maxValue: 100,
 		},
 		default: 50,
-		description: 'Max number of results to return. Maximum: 100 per request (Free tier: 10 max).',
+		description: 'Max number of results to return. Maximum: 100 per request.',
 	},
 	{
 		displayName: 'Filters',

@@ -224,33 +224,6 @@ describe('LiteSoc Node', () => {
           })
         );
       });
-
-      it('should include timestamp when provided in additionalFields', async () => {
-        mockLitesocApiRequest.mockResolvedValue({ id: 'evt_123' });
-
-        const mockFunctions = createMockExecuteFunctions({
-          resource: 'event',
-          operation: 'create',
-          eventType: 'auth.login',
-          actorId: 'user_123',
-          actorEmail: '',
-          userIp: '',
-          additionalFields: {
-            timestamp: '2024-06-15T10:30:00Z',
-          },
-          metadata: {},
-        });
-
-        await node.execute.call(mockFunctions);
-
-        expect(mockLitesocApiRequest).toHaveBeenCalledWith(
-          'POST',
-          '/collect',
-          expect.objectContaining({
-            timestamp: '2024-06-15T10:30:00Z',
-          })
-        );
-      });
     });
 
     describe('event:get', () => {
@@ -532,7 +505,7 @@ describe('LiteSoc Node', () => {
 
         expect(mockLitesocApiRequest).toHaveBeenCalledWith(
           'GET',
-          '/alerts/list',
+          '/alerts',
           {},
           expect.objectContaining({
             severity: 'critical',
@@ -560,13 +533,13 @@ describe('LiteSoc Node', () => {
 
         expect(mockLitesocApiRequestAllItems).toHaveBeenCalledWith(
           'GET',
-          '/alerts/list',
+          '/alerts',
           {},
           {}
         );
       });
 
-      it('should apply all alert filters including dates', async () => {
+      it('should apply all alert filters', async () => {
         mockLitesocApiRequest.mockResolvedValue({ data: [] });
 
         const mockFunctions = createMockExecuteFunctions({
@@ -578,9 +551,6 @@ describe('LiteSoc Node', () => {
             alertType: 'brute_force',
             severity: 'high',
             status: 'open',
-            actorId: 'user_456',
-            startDate: '2024-01-01T00:00:00Z',
-            endDate: '2024-06-30T23:59:59Z',
           },
         });
 
@@ -588,15 +558,12 @@ describe('LiteSoc Node', () => {
 
         expect(mockLitesocApiRequest).toHaveBeenCalledWith(
           'GET',
-          '/alerts/list',
+          '/alerts',
           {},
           expect.objectContaining({
             alert_type: 'brute_force',
             severity: 'high',
             status: 'open',
-            actor_id: 'user_456',
-            start_date: '2024-01-01T00:00:00Z',
-            end_date: '2024-06-30T23:59:59Z',
             limit: 100,
           })
         );

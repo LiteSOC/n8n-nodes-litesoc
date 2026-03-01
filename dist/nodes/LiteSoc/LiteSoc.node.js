@@ -70,20 +70,19 @@ class LiteSoc {
                                 throw new n8n_workflow_1.NodeOperationError(this.getNode(), 'Custom event type must be in format category.action (e.g., billing.payment_failed)');
                             }
                         }
-                        const actorId = this.getNodeParameter('actorId', i);
+                        const actorId = this.getNodeParameter('actorId', i, '');
                         const actorEmail = this.getNodeParameter('actorEmail', i, '');
                         const userIp = this.getNodeParameter('userIp', i, '');
-                        const additionalFields = this.getNodeParameter('additionalFields', i, {});
                         const metadataCollection = this.getNodeParameter('metadata', i, {});
                         const body = {
                             event: eventType,
-                            actor: (0, GenericFunctions_1.buildActor)(actorId, actorEmail),
                         };
+                        const actor = (0, GenericFunctions_1.buildActor)(actorId, actorEmail);
+                        if (actor) {
+                            body.actor = actor;
+                        }
                         if (userIp) {
                             body.user_ip = userIp;
-                        }
-                        if (additionalFields.timestamp) {
-                            body.timestamp = additionalFields.timestamp;
                         }
                         if (metadataCollection.metadataValues) {
                             const metadataItems = metadataCollection.metadataValues;
@@ -102,19 +101,13 @@ class LiteSoc {
                         const filters = this.getNodeParameter('filters', i, {});
                         const qs = {};
                         if (filters.eventType) {
-                            qs.event_type = filters.eventType;
+                            qs.event_name = filters.eventType;
                         }
                         if (filters.actorId) {
                             qs.actor_id = filters.actorId;
                         }
                         if (filters.severity) {
                             qs.severity = filters.severity;
-                        }
-                        if (filters.startDate) {
-                            qs.start_date = filters.startDate;
-                        }
-                        if (filters.endDate) {
-                            qs.end_date = filters.endDate;
                         }
                         if (returnAll) {
                             responseData = await GenericFunctions_1.litesocApiRequestAllItems.call(this, 'GET', '/events', {}, qs);
@@ -151,22 +144,13 @@ class LiteSoc {
                         if (filters.status) {
                             qs.status = filters.status;
                         }
-                        if (filters.actorId) {
-                            qs.actor_id = filters.actorId;
-                        }
-                        if (filters.startDate) {
-                            qs.start_date = filters.startDate;
-                        }
-                        if (filters.endDate) {
-                            qs.end_date = filters.endDate;
-                        }
                         if (returnAll) {
-                            responseData = await GenericFunctions_1.litesocApiRequestAllItems.call(this, 'GET', '/alerts/list', {}, qs);
+                            responseData = await GenericFunctions_1.litesocApiRequestAllItems.call(this, 'GET', '/alerts', {}, qs);
                         }
                         else {
                             const limit = this.getNodeParameter('limit', i);
                             qs.limit = limit;
-                            const response = (await GenericFunctions_1.litesocApiRequest.call(this, 'GET', '/alerts/list', {}, qs));
+                            const response = (await GenericFunctions_1.litesocApiRequest.call(this, 'GET', '/alerts', {}, qs));
                             responseData =
                                 response.data ||
                                     response.alerts ||

@@ -209,7 +209,6 @@ exports.eventFields = [
         displayName: 'Actor ID',
         name: 'actorId',
         type: 'string',
-        required: true,
         displayOptions: {
             show: {
                 resource: ['event'],
@@ -221,7 +220,7 @@ exports.eventFields = [
         },
         default: '',
         placeholder: 'user_123',
-        description: 'Unique identifier for the actor (user) performing the action. Maximum 255 characters.',
+        description: 'Unique identifier for the actor (user) performing the action. Maximum 255 characters. Optional for system events.',
     },
     {
         displayName: 'Actor Email',
@@ -250,28 +249,6 @@ exports.eventFields = [
         default: '',
         placeholder: '192.168.1.1',
         description: 'IP address of the user making the request',
-    },
-    {
-        displayName: 'Additional Fields',
-        name: 'additionalFields',
-        type: 'collection',
-        placeholder: 'Add Field',
-        default: {},
-        displayOptions: {
-            show: {
-                resource: ['event'],
-                operation: ['create'],
-            },
-        },
-        options: [
-            {
-                displayName: 'Timestamp',
-                name: 'timestamp',
-                type: 'dateTime',
-                default: '',
-                description: 'Custom timestamp for the event (defaults to current time)',
-            },
-        ],
     },
     {
         displayName: 'Metadata',
@@ -358,7 +335,7 @@ exports.eventFields = [
             maxValue: 100,
         },
         default: 50,
-        description: 'Max number of results to return. Maximum: 100 per request (Free tier: 10 max).',
+        description: 'Max number of results to return. Maximum: 100 per request.',
     },
     {
         displayName: 'Filters',
@@ -379,7 +356,7 @@ exports.eventFields = [
                 type: 'string',
                 default: '',
                 placeholder: 'auth.login_failed',
-                description: 'Filter by event type',
+                description: 'Filter by event type (sent as event_name to API)',
             },
             {
                 displayName: 'Actor ID',
@@ -412,20 +389,6 @@ exports.eventFields = [
                 default: '',
                 description: 'Filter by severity level (computed from event type)',
                 hint: 'Each returned event includes a "severity" field. Use {{ $json.severity }} in IF/Switch nodes to route by severity.',
-            },
-            {
-                displayName: 'Start Date',
-                name: 'startDate',
-                type: 'dateTime',
-                default: '',
-                description: 'Filter events after this date',
-            },
-            {
-                displayName: 'End Date',
-                name: 'endDate',
-                type: 'dateTime',
-                default: '',
-                description: 'Filter events before this date',
             },
         ],
     },

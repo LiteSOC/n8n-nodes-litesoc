@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-03-02
+
+### Changed
+- **Alerts Endpoint**: Changed from `/alerts/list` to `/alerts` to match the documented public API
+- **Event Collection**: Removed `timestamp` from additionalFields (API auto-generates timestamps)
+- **Actor ID**: Made `actorId` field optional with empty string default (matches API behavior)
+
+### Removed
+- **Alert Filters**: Removed undocumented filter options that are not supported by the public API:
+  - `actorId` - Filter by actor ID
+  - `startDate` - Filter alerts after this date
+  - `endDate` - Filter alerts before this date
+
+### Fixed
+- **Pagination**: Fixed `litesocApiRequestAllItems` to correctly use `offset` parameter and read `pagination.total` from response
+
 ## [1.2.0] - 2026-03-05
 
 ### Fixed

@@ -98,25 +98,25 @@ export class LiteSoc implements INodeType {
 							}
 						}
 
-						const actorId = this.getNodeParameter('actorId', i) as string;
+						const actorId = this.getNodeParameter('actorId', i, '') as string;
 						const actorEmail = this.getNodeParameter('actorEmail', i, '') as string;
 						const userIp = this.getNodeParameter('userIp', i, '') as string;
-						const additionalFields = this.getNodeParameter('additionalFields', i, {}) as IDataObject;
 						const metadataCollection = this.getNodeParameter('metadata', i, {}) as IDataObject;
 
 						// Build the event payload
 						const body: IDataObject = {
 							event: eventType,
-							actor: buildActor(actorId, actorEmail),
 						};
+
+						// Add actor only if provided (optional for system events)
+						const actor = buildActor(actorId, actorEmail);
+						if (actor) {
+							body.actor = actor;
+						}
 
 						// Add optional fields
 						if (userIp) {
 							body.user_ip = userIp;
-						}
-
-						if (additionalFields.timestamp) {
-							body.timestamp = additionalFields.timestamp;
 						}
 
 						// Parse and add metadata
@@ -227,7 +227,7 @@ export class LiteSoc implements INodeType {
 
 						const qs: IDataObject = {};
 
-						// Apply filters
+						// Apply filters (documented in GET /v1/alerts)
 						if (filters.alertType) {
 							qs.alert_type = filters.alertType;
 						}
@@ -237,21 +237,12 @@ export class LiteSoc implements INodeType {
 						if (filters.status) {
 							qs.status = filters.status;
 						}
-						if (filters.actorId) {
-							qs.actor_id = filters.actorId;
-						}
-						if (filters.startDate) {
-							qs.start_date = filters.startDate;
-						}
-						if (filters.endDate) {
-							qs.end_date = filters.endDate;
-						}
 
 						if (returnAll) {
 							responseData = await litesocApiRequestAllItems.call(
 								this,
 								'GET',
-								'/alerts/list',
+								'/alerts',
 								{},
 								qs,
 							);
@@ -261,7 +252,7 @@ export class LiteSoc implements INodeType {
 							const response = (await litesocApiRequest.call(
 								this,
 								'GET',
-								'/alerts/list',
+								'/alerts',
 								{},
 								qs,
 							)) as IDataObject;

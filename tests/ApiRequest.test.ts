@@ -549,7 +549,7 @@ describe('litesocApiRequestAllItems', () => {
       expect.objectContaining({
         qs: expect.objectContaining({
           severity: 'critical',
-          page: 1,
+          offset: 0,
           limit: 100,
         }),
       })
