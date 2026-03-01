@@ -368,7 +368,7 @@ describe('LiteSoc Node', () => {
           '/events',
           {},
           expect.objectContaining({
-            event_type: 'auth.login',
+            event_name: 'auth.login',
             severity: 'high',
             actor_id: 'user_123',
             limit: 10,
@@ -409,33 +409,8 @@ describe('LiteSoc Node', () => {
         expect(result[0]).toHaveLength(0);
       });
 
-      it('should apply date filters when provided', async () => {
-        mockLitesocApiRequest.mockResolvedValue({ data: [] });
-
-        const mockFunctions = createMockExecuteFunctions({
-          resource: 'event',
-          operation: 'getAll',
-          returnAll: false,
-          limit: 50,
-          filters: {
-            startDate: '2024-01-01T00:00:00Z',
-            endDate: '2024-12-31T23:59:59Z',
-          },
-        });
-
-        await node.execute.call(mockFunctions);
-
-        expect(mockLitesocApiRequest).toHaveBeenCalledWith(
-          'GET',
-          '/events',
-          {},
-          expect.objectContaining({
-            start_date: '2024-01-01T00:00:00Z',
-            end_date: '2024-12-31T23:59:59Z',
-            limit: 50,
-          })
-        );
-      });
+      // Note: Date filters (start_date, end_date) are not supported by the Events API
+      // They are only supported by the Alerts API
     });
   });
 

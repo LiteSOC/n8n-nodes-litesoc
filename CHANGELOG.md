@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-03-05
+
+### Fixed
+- **API Compatibility**: Changed `event_type` parameter to `event_name` in Get Many Events operation to match the LiteSOC Management API specification
+- **Events Filters**: Removed unsupported `startDate` and `endDate` filter options from Events operations (date filtering is supported on Alerts only)
+
+### Changed
+- Updated test expectations to reflect corrected parameter names
+
 ## [1.1.0] - 2026-03-01
 
 ### Added

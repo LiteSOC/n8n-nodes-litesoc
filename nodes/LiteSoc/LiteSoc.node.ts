@@ -159,7 +159,7 @@ export class LiteSoc implements INodeType {
 
 						// Apply filters
 						if (filters.eventType) {
-							qs.event_type = filters.eventType;
+							qs.event_name = filters.eventType;
 						}
 						if (filters.actorId) {
 							qs.actor_id = filters.actorId;
@@ -167,12 +167,8 @@ export class LiteSoc implements INodeType {
 						if (filters.severity) {
 							qs.severity = filters.severity;
 						}
-						if (filters.startDate) {
-							qs.start_date = filters.startDate;
-						}
-						if (filters.endDate) {
-							qs.end_date = filters.endDate;
-						}
+						// Note: start_date and end_date are not supported by the events API
+						// They are only supported by the alerts API
 
 						if (returnAll) {
 							responseData = await litesocApiRequestAllItems.call(
