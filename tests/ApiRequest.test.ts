@@ -4,7 +4,7 @@
  */
 
 import type { IDataObject, IExecuteFunctions, IHttpRequestOptions } from 'n8n-workflow';
-import { litesocApiRequest, litesocApiRequestAllItems } from '../nodes/LiteSoc/GenericFunctions';
+import { litesocApiRequest, litesocApiRequestAllItems, parsePlanMetadataFromHeaders } from '../nodes/LiteSoc/GenericFunctions';
 
 // Create mock for httpRequestWithAuthentication
 const mockHttpRequestWithAuthentication = jest.fn();
@@ -19,6 +19,54 @@ const createMockContext = (): IExecuteFunctions => {
   } as unknown as IExecuteFunctions;
 };
 
+// Helper to create full response format (body + headers)
+const createFullResponse = (body: IDataObject | IDataObject[], headers: Record<string, string> = {}) => ({
+  body,
+  headers: {
+    'x-litesoc-plan': 'pro',
+    'x-litesoc-retention': '30 days',
+    'x-litesoc-cutoff': '2026-02-02T00:00:00.000Z',
+    ...headers,
+  },
+});
+
+describe('parsePlanMetadataFromHeaders', () => {
+  it('should parse all plan metadata headers', () => {
+    const headers = {
+      'X-LiteSOC-Plan': 'enterprise',
+      'X-LiteSOC-Retention': '90 days',
+      'X-LiteSOC-Cutoff': '2025-12-01T00:00:00.000Z',
+    };
+    const result = parsePlanMetadataFromHeaders(headers);
+    expect(result.plan).toBe('enterprise');
+    expect(result.retentionDays).toBe(90);
+    expect(result.cutoffDate).toBe('2025-12-01T00:00:00.000Z');
+  });
+
+  it('should handle numeric-only retention format', () => {
+    const headers = {
+      'x-litesoc-retention': '30',
+    };
+    const result = parsePlanMetadataFromHeaders(headers);
+    expect(result.retentionDays).toBe(30);
+  });
+
+  it('should handle missing headers gracefully', () => {
+    const result = parsePlanMetadataFromHeaders({});
+    expect(result.plan).toBeNull();
+    expect(result.retentionDays).toBeNull();
+    expect(result.cutoffDate).toBeNull();
+  });
+
+  it('should handle invalid retention format', () => {
+    const headers = {
+      'x-litesoc-retention': 'invalid',
+    };
+    const result = parsePlanMetadataFromHeaders(headers);
+    expect(result.retentionDays).toBeNull();
+  });
+});
+
 describe('litesocApiRequest', () => {
   let mockContext: IExecuteFunctions;
 
@@ -29,8 +77,8 @@ describe('litesocApiRequest', () => {
 
   describe('successful requests', () => {
     it('should make GET request with correct options', async () => {
-      const mockResponse = { id: 'evt_123', event: 'auth.login' };
-      mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
+      const mockBody = { id: 'evt_123', event: 'auth.login' };
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse(mockBody));
 
       const result = await litesocApiRequest.call(mockContext, 'GET', '/events/evt_123');
 
@@ -40,17 +88,19 @@ describe('litesocApiRequest', () => {
           method: 'GET',
           url: 'https://api.litesoc.io/events/evt_123',
           json: true,
+          returnFullResponse: true,
           headers: expect.objectContaining({
             'User-Agent': expect.stringContaining('n8n-litesoc-node'),
           }),
         })
       );
-      expect(result).toEqual(mockResponse);
+      expect(result).toMatchObject(mockBody);
+      expect((result as IDataObject)._planMetadata).toBeDefined();
     });
 
     it('should make POST request with body', async () => {
-      const mockResponse = { id: 'evt_456', event: 'auth.logout' };
-      mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
+      const mockBody = { id: 'evt_456', event: 'auth.logout' };
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse(mockBody));
 
       const body = { event: 'auth.logout', actor: { id: 'user_123' } };
       const result = await litesocApiRequest.call(mockContext, 'POST', '/collect', body);
@@ -63,11 +113,11 @@ describe('litesocApiRequest', () => {
           body,
         })
       );
-      expect(result).toEqual(mockResponse);
+      expect(result).toMatchObject(mockBody);
     });
 
     it('should include query string when provided', async () => {
-      mockHttpRequestWithAuthentication.mockResolvedValue({ data: [] });
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse({ data: [] }));
 
       const qs = { limit: 10, severity: 'high' };
       await litesocApiRequest.call(mockContext, 'GET', '/events', {}, qs);
@@ -81,7 +131,7 @@ describe('litesocApiRequest', () => {
     });
 
     it('should not include body for GET requests', async () => {
-      mockHttpRequestWithAuthentication.mockResolvedValue({});
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse({}));
 
       await litesocApiRequest.call(mockContext, 'GET', '/events');
 
@@ -90,8 +140,8 @@ describe('litesocApiRequest', () => {
     });
 
     it('should handle PATCH request', async () => {
-      const mockResponse = { id: 'alt_123', status: 'resolved' };
-      mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
+      const mockBody = { id: 'alt_123', status: 'resolved' };
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse(mockBody));
 
       const body = { action: 'resolve', resolution_type: 'fixed' };
       await litesocApiRequest.call(mockContext, 'PATCH', '/alerts/alt_123', body);
@@ -103,6 +153,47 @@ describe('litesocApiRequest', () => {
           body,
         })
       );
+    });
+
+    it('should attach plan metadata to response object', async () => {
+      const mockBody = { id: 'evt_123', event: 'auth.login' };
+      mockHttpRequestWithAuthentication.mockResolvedValue(createFullResponse(mockBody, {
+        'x-litesoc-plan': 'enterprise',
+        'x-litesoc-retention': '90 days',
+        'x-litesoc-cutoff': '2025-11-01T00:00:00.000Z',
+      }));
+
+      const result = await litesocApiRequest.call(mockContext, 'GET', '/events/evt_123') as IDataObject;
+
+      expect(result._planMetadata).toEqual({
+        plan: 'enterprise',
+        retentionDays: 90,
+        cutoffDate: '2025-11-01T00:00:00.000Z',
+      });
+    });
+
+    it('should handle missing headers in response', async () => {
+      mockHttpRequestWithAuthentication.mockResolvedValue({ body: { id: 'evt_123' }, headers: {} });
+
+      const result = await litesocApiRequest.call(mockContext, 'GET', '/events/evt_123') as IDataObject;
+
+      expect(result._planMetadata).toEqual({
+        plan: null,
+        retentionDays: null,
+        cutoffDate: null,
+      });
+    });
+
+    it('should handle undefined headers in response', async () => {
+      mockHttpRequestWithAuthentication.mockResolvedValue({ body: { id: 'evt_456' }, headers: undefined });
+
+      const result = await litesocApiRequest.call(mockContext, 'GET', '/events/evt_456') as IDataObject;
+
+      expect(result._planMetadata).toEqual({
+        plan: null,
+        retentionDays: null,
+        cutoffDate: null,
+      });
     });
   });
 
@@ -469,13 +560,13 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should fetch all items when total is less than page size', async () => {
-    const mockResponse = {
+    const mockResponse = createFullResponse({
       data: [
         { id: 'evt_1', event: 'auth.login' },
         { id: 'evt_2', event: 'auth.logout' },
       ],
       total: 2,
-    };
+    });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/events');
@@ -485,14 +576,14 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should paginate and fetch all items across multiple pages', async () => {
-    const page1Response = {
+    const page1Response = createFullResponse({
       data: Array(100).fill({ id: 'evt', event: 'auth.login' }),
       total: 150,
-    };
-    const page2Response = {
+    });
+    const page2Response = createFullResponse({
       data: Array(50).fill({ id: 'evt', event: 'auth.login' }),
       total: 150,
-    };
+    });
     
     mockHttpRequestWithAuthentication
       .mockResolvedValueOnce(page1Response)
@@ -505,10 +596,10 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should stop when limit is reached', async () => {
-    const mockResponse = {
+    const mockResponse = createFullResponse({
       data: Array(100).fill({ id: 'evt', event: 'auth.login' }),
       total: 500,
-    };
+    });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/events', {}, {}, 50);
@@ -517,13 +608,13 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should handle response with items instead of data', async () => {
-    const mockResponse = {
+    const mockResponse = createFullResponse({
       items: [
         { id: 'alt_1', type: 'brute_force' },
         { id: 'alt_2', type: 'suspicious_login' },
       ],
       total: 2,
-    };
+    });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/alerts/list');
@@ -533,7 +624,7 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should include query string parameters', async () => {
-    const mockResponse = { data: [], total: 0 };
+    const mockResponse = createFullResponse({ data: [], total: 0 });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     await litesocApiRequestAllItems.call(
@@ -557,10 +648,10 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should stop when returned items are less than page size', async () => {
-    const mockResponse = {
+    const mockResponse = createFullResponse({
       data: [{ id: 'evt_1' }],
       total: 0, // total is not reliable, so check items length
-    };
+    });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/events');
@@ -570,7 +661,7 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should handle empty response', async () => {
-    const mockResponse = { data: [], total: 0 };
+    const mockResponse = createFullResponse({ data: [], total: 0 });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/events');
@@ -579,7 +670,7 @@ describe('litesocApiRequestAllItems', () => {
   });
 
   it('should handle response without data or items array', async () => {
-    const mockResponse = { total: 0 };
+    const mockResponse = createFullResponse({ total: 0 });
     mockHttpRequestWithAuthentication.mockResolvedValue(mockResponse);
 
     const result = await litesocApiRequestAllItems.call(mockContext, 'GET', '/events');

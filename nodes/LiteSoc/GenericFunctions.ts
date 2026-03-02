@@ -11,13 +11,64 @@ import type {
 import { NodeApiError } from 'n8n-workflow';
 
 // LiteSOC n8n Node version - used for User-Agent header
-const LITESOC_NODE_VERSION = '1.3.0';
+const LITESOC_NODE_VERSION = '1.4.0';
 
 // Production API URL
 const LITESOC_API_BASE_URL = 'https://api.litesoc.io';
 
 /**
+ * Plan metadata extracted from API response headers
+ * These headers are returned with every LiteSOC API response
+ */
+export interface LiteSOCPlanMetadata {
+	/** Current plan: 'free', 'pro', or 'enterprise' */
+	plan: string | null;
+	/** Data retention period in days */
+	retentionDays: number | null;
+	/** Oldest accessible data date (ISO 8601) */
+	cutoffDate: string | null;
+}
+
+/**
+ * Extended response that includes plan metadata
+ */
+export interface LiteSOCApiResponse {
+	data: IDataObject | IDataObject[];
+	_planMetadata?: LiteSOCPlanMetadata;
+}
+
+/**
+ * Parse plan metadata from API response headers
+ * Extracts X-LiteSOC-Plan, X-LiteSOC-Retention, and X-LiteSOC-Cutoff
+ */
+export function parsePlanMetadataFromHeaders(headers: Record<string, string>): LiteSOCPlanMetadata {
+	// Normalize header keys to lowercase for case-insensitive access
+	const normalizedHeaders: Record<string, string> = {};
+	for (const [key, value] of Object.entries(headers)) {
+		normalizedHeaders[key.toLowerCase()] = value;
+	}
+
+	const plan = normalizedHeaders['x-litesoc-plan'] || null;
+	
+	// Parse retention days - API returns "30 days" or "30" format
+	let retentionDays: number | null = null;
+	const retentionStr = normalizedHeaders['x-litesoc-retention'];
+	if (retentionStr) {
+		const cleaned = retentionStr.replace(/\s*days?\s*/gi, '').trim();
+		const parsed = parseInt(cleaned, 10);
+		if (!isNaN(parsed)) {
+			retentionDays = parsed;
+		}
+	}
+
+	const cutoffDate = normalizedHeaders['x-litesoc-cutoff'] || null;
+
+	return { plan, retentionDays, cutoffDate };
+}
+
+/**
  * Make an authenticated API request to LiteSOC
+ * Extracts plan metadata from response headers and includes it in the response
  */
 export async function litesocApiRequest(
 	this: IExecuteFunctions | IHookFunctions | ILoadOptionsFunctions | IWebhookFunctions,
@@ -30,6 +81,7 @@ export async function litesocApiRequest(
 		method,
 		url: `${LITESOC_API_BASE_URL}${endpoint}`,
 		json: true,
+		returnFullResponse: true, // Get headers along with body
 		headers: {
 			'User-Agent': `n8n-litesoc-node/${LITESOC_NODE_VERSION}`,
 		},
@@ -46,12 +98,23 @@ export async function litesocApiRequest(
 	}
 
 	try {
-		const response = await this.helpers.httpRequestWithAuthentication.call(
+		const fullResponse = await this.helpers.httpRequestWithAuthentication.call(
 			this,
 			'liteSocApi',
 			options,
-		);
-		return response as IDataObject | IDataObject[];
+		) as { body: IDataObject | IDataObject[]; headers: Record<string, string> };
+
+		// Extract plan metadata from headers
+		const planMetadata = parsePlanMetadataFromHeaders(fullResponse.headers || {});
+		
+		// If the response is an object, attach plan metadata
+		const responseBody = fullResponse.body;
+		if (responseBody && typeof responseBody === 'object' && !Array.isArray(responseBody)) {
+			// Attach plan metadata to response for visibility in n8n
+			(responseBody as IDataObject)._planMetadata = planMetadata as unknown as IDataObject;
+		}
+
+		return responseBody;
 	} catch (error) {
 		const err = error as JsonObject & { 
 			cause?: { code?: number; body?: JsonObject }; 

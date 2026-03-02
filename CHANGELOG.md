@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-03-02
+
+### Added
+- **Plan Metadata Headers**: Parse and expose `X-LiteSOC-Plan`, `X-LiteSOC-Retention`, and `X-LiteSOC-Cutoff` headers from API responses
+  - `_planMetadata.plan`: Current plan tier (free, pro, enterprise)
+  - `_planMetadata.retentionDays`: Data retention period in days
+  - `_planMetadata.cutoffDate`: Earliest accessible event date (ISO 8601)
+
+### Fixed
+- **Alert Default Limit**: Changed default `limit` from 50 to 100 to match SDK and backend defaults
+- **Alert Max Limit**: Changed `maxValue` from 100 to 500 to match backend capabilities
+
+### Changed
+- Updated `litesocApiRequest` to use `returnFullResponse: true` for header access
+
 ## [1.3.0] - 2026-03-02
 
 ### Changed

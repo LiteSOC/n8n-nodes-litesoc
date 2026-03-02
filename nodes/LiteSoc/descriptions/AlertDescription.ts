@@ -91,10 +91,10 @@ export const alertFields: INodeProperties[] = [
 		},
 		typeOptions: {
 			minValue: 1,
-			maxValue: 100,
+			maxValue: 500,
 		},
-		default: 50,
-		description: 'Max number of results to return',
+		default: 100,
+		description: 'Max number of results to return. Default: 100, Max: 500 (Enterprise only, Pro max: 200)',
 	},
 	{
 		displayName: 'Filters',
