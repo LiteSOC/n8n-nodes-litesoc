@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.parsePlanMetadataFromHeaders = parsePlanMetadataFromHeaders;
 exports.litesocApiRequest = litesocApiRequest;
 exports.litesocApiRequestAllItems = litesocApiRequestAllItems;
 exports.formatEventType = formatEventType;
@@ -7,13 +8,32 @@ exports.validateSeverity = validateSeverity;
 exports.buildActor = buildActor;
 exports.parseMetadata = parseMetadata;
 const n8n_workflow_1 = require("n8n-workflow");
-const LITESOC_NODE_VERSION = '1.3.0';
+const LITESOC_NODE_VERSION = '1.4.0';
 const LITESOC_API_BASE_URL = 'https://api.litesoc.io';
+function parsePlanMetadataFromHeaders(headers) {
+    const normalizedHeaders = {};
+    for (const [key, value] of Object.entries(headers)) {
+        normalizedHeaders[key.toLowerCase()] = value;
+    }
+    const plan = normalizedHeaders['x-litesoc-plan'] || null;
+    let retentionDays = null;
+    const retentionStr = normalizedHeaders['x-litesoc-retention'];
+    if (retentionStr) {
+        const cleaned = retentionStr.replace(/\s*days?\s*/gi, '').trim();
+        const parsed = parseInt(cleaned, 10);
+        if (!isNaN(parsed)) {
+            retentionDays = parsed;
+        }
+    }
+    const cutoffDate = normalizedHeaders['x-litesoc-cutoff'] || null;
+    return { plan, retentionDays, cutoffDate };
+}
 async function litesocApiRequest(method, endpoint, body = {}, qs = {}) {
     const options = {
         method,
         url: `${LITESOC_API_BASE_URL}${endpoint}`,
         json: true,
+        returnFullResponse: true,
         headers: {
             'User-Agent': `n8n-litesoc-node/${LITESOC_NODE_VERSION}`,
         },
@@ -25,8 +45,13 @@ async function litesocApiRequest(method, endpoint, body = {}, qs = {}) {
         options.qs = qs;
     }
     try {
-        const response = await this.helpers.httpRequestWithAuthentication.call(this, 'liteSocApi', options);
-        return response;
+        const fullResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'liteSocApi', options);
+        const planMetadata = parsePlanMetadataFromHeaders(fullResponse.headers || {});
+        const responseBody = fullResponse.body;
+        if (responseBody && typeof responseBody === 'object' && !Array.isArray(responseBody)) {
+            responseBody._planMetadata = planMetadata;
+        }
+        return responseBody;
     }
     catch (error) {
         const err = error;

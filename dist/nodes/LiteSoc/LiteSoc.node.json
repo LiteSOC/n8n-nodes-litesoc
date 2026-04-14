@@ -15,8 +15,5 @@
 			}
 		]
 	},
-	"alias": ["security", "audit", "soc", "siem", "threat", "compliance", "logging", "monitoring"],
-	"subcategories": {
-		"Security": ["Audit", "Compliance", "Threat Detection"]
-	}
+	"alias": ["security", "audit", "soc", "siem", "threat", "compliance", "logging", "monitoring"]
 }
